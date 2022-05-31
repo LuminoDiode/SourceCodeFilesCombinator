@@ -39,7 +39,7 @@
 				</GroupBox>
 				<Button Name="ProceedTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10" Click="ProceedTB_Click">Выполнить</Button>
 			</StackPanel>
-			<RichTextBox Name="OutputRTB" Background="Beige" Margin="5" Width="600" Height="500" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="True"></RichTextBox>
+			<RichTextBox Block.LineHeight="1" Name="OutputRTB" Background="Beige" Margin="5" Width="600" Height="500" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="True"></RichTextBox>
 		</StackPanel>
 	</Grid>
 </Window>

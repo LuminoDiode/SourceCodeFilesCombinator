@@ -166,6 +166,8 @@ namespace SourceCodeFilesComplier
 
 		private void ProceedTB_Click(object sender, RoutedEventArgs e)
 		{
+			this.OutputRTB.Document.Blocks.Clear();
+
 			IEnumerable<FileInfo> files;
 			try{ files = GetInputFilesOrShowErrorToUser(); } catch { return; }
 
