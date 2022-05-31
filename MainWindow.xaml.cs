@@ -170,6 +170,19 @@ namespace SourceCodeFilesComplier
 			fd.Dispose();
 		}
 
+		private string GenerateOutput(IEnumerable<FileInfo> fis)
+		{
+			var ToAppendSb = new StringBuilder((int)(fis.Sum(x => x.Length) / 2));
+
+			foreach (var f in fis)
+			{
+				ToAppendSb.Append(this.ProceedSourceCode(f, this.AddFileNamesInOutput, this.RemoveEmptyLinesInOutput, this.AddFileNamesInOutput));
+				ToAppendSb.Append('\n');
+			}
+
+			return ToAppendSb.ToString();
+		}
+
 		private void ProceedTB_Click(object sender, RoutedEventArgs e)
 		{
 			this.OutputRTB.Document.Blocks.Clear();
@@ -177,20 +190,20 @@ namespace SourceCodeFilesComplier
 			IEnumerable<FileInfo> files;
 			try { files = GetInputFilesOrShowErrorToUser(); } catch { return; }
 
-			var ToAppendSb = new StringBuilder((int)(files.Sum(x => x.Length) / 2));
-
-			foreach (var f in files)
-			{
-				ToAppendSb.Append(this.ProceedSourceCode(f, this.AddFileNamesInOutput, this.RemoveEmptyLinesInOutput, this.AddFileNamesInOutput));
-				ToAppendSb.Append('\n');
-			}
-
-			this.OutputRTB.AppendText(ToAppendSb.ToString());
+			this.OutputRTB.AppendText(this.GenerateOutput(files));
 		}
 
-		private void СlearOutputTB_Click(object sender, RoutedEventArgs e)
+		private void ExportToFileTB_Click(object sender, RoutedEventArgs e)
 		{
-			this.OutputRTB.Document.Blocks.Clear();
+			var fd = new SaveFileDialog();
+			fd.Filter = @"Text files (*.txt)|*.txt|All files (*.*)|*.*";
+			fd.ShowDialog();
+			if (!string.IsNullOrEmpty(fd.FileName))
+			{
+				IEnumerable<FileInfo> files;
+				try { files = GetInputFilesOrShowErrorToUser(); } catch { return; }
+				File.WriteAllText(fd.FileName, this.GenerateOutput(files));
+			}
 		}
 	}
 }
