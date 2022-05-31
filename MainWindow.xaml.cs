@@ -52,6 +52,7 @@ namespace SourceCodeFilesComplier
 			else
 			{
 				this.FolderInputTB.Background = this.OkBrush;
+				this.LastCorrectSearchDirFullName = dir.FullName;
 				return dir;
 			}
 		}
@@ -80,7 +81,7 @@ namespace SourceCodeFilesComplier
 		private string GetNameByCurrentVariant(FileInfo fi)
 		{
 			if (this.FileNameVariantInOutput == FileNameVariant.FULL_PATH) return fi.FullName;
-			if (this.FileNameVariantInOutput == FileNameVariant.TO_SHARED_PATH) return fi.FullName.Replace(this.GetSearchDirectoryOrShowErrorToUser().FullName, string.Empty);
+			if (this.FileNameVariantInOutput == FileNameVariant.TO_SHARED_PATH) return fi.FullName.Replace(LastCorrectSearchDirFullName, string.Empty);
 			if (this.FileNameVariantInOutput == FileNameVariant.FILE_NAME_ONLY) return fi.Name;
 
 			throw new NotImplementedException();
@@ -88,37 +89,39 @@ namespace SourceCodeFilesComplier
 		private string ProceedSourceCode(FileInfo sourceCodeFile, bool addFileName, bool removeLineIndets, bool addLinesNumbers)
 		{
 			var alltext = File.ReadAllText(sourceCodeFile.FullName);
-			var sb = new StringBuilder(alltext.Length+sourceCodeFile.FullName.Length);
+			var sb = new StringBuilder(alltext.Length + sourceCodeFile.FullName.Length);
 
 			IEnumerable<string> lines = alltext.Split('\n');
-			if (this.RemoveEmptyLinesInOutput) lines = lines.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-			if (this.RemoveIndentInOutput) lines = lines.Select(x => x.Trim()); else lines = lines.Select(x => x.TrimEnd());
 
 			var lns = lines.ToArray();
 
-			var t = (GetNameByCurrentVariant(sourceCodeFile));
 			if (this.AddFileNamesInOutput) sb.AppendLine(GetNameByCurrentVariant(sourceCodeFile));
 
 			int lineCounter = 1;
-			int totalLines = lns.Length;
-			int maxLineNumberLength = totalLines.ToString().Length;
+			int maxLineNumberLength = lns.Length.ToString().Length;
 
-			for(int i =0; i < lns.Length; i++)
+			for (int i = 0; i < lns.Length; i++)
 			{
+				if (this.RemoveEmptyLinesInOutput && string.IsNullOrWhiteSpace(lns[i])) continue;
+
 				if (this.AddLineNumsInOutput)
 				{
 					var currentLineNumber = lineCounter++.ToString();
 
-					int numOfSpace=0;
+					int numOfSpace = 0;
 					if (this.CommonLinesNumsLengthInOutput)
-						numOfSpace = maxLineNumberLength - currentLineNumber.Length+1;
+						numOfSpace = maxLineNumberLength - currentLineNumber.Length + 1;
 					if (numOfSpace < 1) numOfSpace = 1;
 
 					sb.Append(currentLineNumber);
 					sb.Append(new String(' ', numOfSpace));
 				}
 
-				sb.AppendLine(lns[i]);
+				if (this.RemoveIndentInOutput)
+					sb.AppendLine(lns[i].Trim());
+				else
+					sb.AppendLine(lns[i].TrimEnd());
+
 			}
 
 			return sb.ToString();
@@ -145,9 +148,11 @@ namespace SourceCodeFilesComplier
 			}
 		}
 		private bool RemoveIndentInOutput => this.RemoveIndentCB.IsChecked.Value;
-		private bool AddLineNumsInOutput => this.AddFileNamesCB.IsChecked.Value;
+		private bool AddLineNumsInOutput => this.AddLineNumsCB.IsChecked.Value;
 		private bool RemoveEmptyLinesInOutput => this.RemoveEmptyCB.IsChecked.Value;
 		private bool CommonLinesNumsLengthInOutput => this.CommonLinesNumsLengthCB.IsChecked.Value;
+
+		private string LastCorrectSearchDirFullName;
 
 		public MainWindow()
 		{
@@ -162,6 +167,7 @@ namespace SourceCodeFilesComplier
 			{
 				this.FolderInputTB.Text = fd.SelectedPath;
 			}
+			fd.Dispose();
 		}
 
 		private void ProceedTB_Click(object sender, RoutedEventArgs e)
@@ -169,9 +175,22 @@ namespace SourceCodeFilesComplier
 			this.OutputRTB.Document.Blocks.Clear();
 
 			IEnumerable<FileInfo> files;
-			try{ files = GetInputFilesOrShowErrorToUser(); } catch { return; }
+			try { files = GetInputFilesOrShowErrorToUser(); } catch { return; }
 
-			this.OutputRTB.AppendText(string.Join('\n', files.Select(f => this.ProceedSourceCode(f,this.AddFileNamesInOutput,this.RemoveEmptyLinesInOutput,this.AddFileNamesInOutput))));
+			var ToAppendSb = new StringBuilder((int)(files.Sum(x => x.Length) / 2));
+
+			foreach (var f in files)
+			{
+				ToAppendSb.Append(this.ProceedSourceCode(f, this.AddFileNamesInOutput, this.RemoveEmptyLinesInOutput, this.AddFileNamesInOutput));
+				ToAppendSb.Append('\n');
+			}
+
+			this.OutputRTB.AppendText(ToAppendSb.ToString());
+		}
+
+		private void СlearOutputTB_Click(object sender, RoutedEventArgs e)
+		{
+			this.OutputRTB.Document.Blocks.Clear();
 		}
 	}
 }
