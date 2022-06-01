@@ -23,7 +23,6 @@ namespace SourceCodeFilesComplier
 		private SolidColorBrush ErrorBrush = new SolidColorBrush(Color.FromRgb(255, 220, 220));
 		private SolidColorBrush OkBrush = new SolidColorBrush(Color.FromRgb(220, 255, 220));
 
-
 		/// <exception cref="System.FormatException"/>
 		private string[] GetFileExtensionsOrShowErrorToUser()
 		{
@@ -71,14 +70,7 @@ namespace SourceCodeFilesComplier
 			return fls.Where(x => exts.Any(e => x.Extension.EndsWith(e)));
 		}
 
-		/// <exception cref="System.AggregateException"/>
-		/// <exception cref="System.FormatException"/>
-		private IEnumerable<string> GetInputFilesTextsOrShowErrorToUser()
-		{
-			return GetInputFilesOrShowErrorToUser().Select(x => File.ReadAllText(x.FullName));
-		}
-
-		private string LastCorrectSearchDirFullName;
+		private string LastCorrectSearchDirFullName { get; set; }
 
 		public MainWindow()
 		{
