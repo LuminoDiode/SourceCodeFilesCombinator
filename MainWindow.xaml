@@ -9,39 +9,39 @@
 	<Grid>
 		<StackPanel Orientation="Horizontal">
 			<StackPanel Orientation="Vertical" Margin="5">
-				<GroupBox Header="Расширения файлов" FontSize="14">
+				<GroupBox Header="File extensions" FontSize="14">
 					<StackPanel Orientation="Vertical" Margin="10" >
 						<TextBox Name="FileExtsInputTB" Width="350" FontSize="14">.cs .cshtml .json .js</TextBox>
 					</StackPanel>
 				</GroupBox>
-				<GroupBox Header="Директория поиска" FontSize="14">
+				<GroupBox Header="Search directory" FontSize="14">
 					<StackPanel Orientation="Vertical" Margin="10">
 						<TextBox Name="FolderInputTB" Width="350" FontSize="14" >C:\Users\User\source\</TextBox>
-						<Button Name="OpenFolderDialogBT" Width="350" FontSize="14" Click="OpenFolderDialogBT_Click">Открыть диалог выбора папки</Button>
-						<CheckBox Name="SearchSubDirsCB" IsChecked="True" FontSize="14">Искать во вложенных папках</CheckBox>
+						<Button Name="OpenFolderDialogBT" Width="350" FontSize="14" Click="OpenFolderDialogBT_Click">Open folder dialog</Button>
+						<CheckBox Name="SearchSubDirsCB" IsChecked="True" FontSize="14">Search in subdirectories</CheckBox>
 					</StackPanel>
 				</GroupBox>
-				<GroupBox Header="Настройки вывода" FontSize="14">
+				<GroupBox Header="Output settings" FontSize="14">
 					<StackPanel Orientation="Vertical" Margin="10">
-						<CheckBox Name="AddFileNamesCB" IsChecked="True" FontSize="14">Добавить имена файлов</CheckBox>
+						<CheckBox Name="AddFileNamesCB" IsChecked="True" FontSize="14">Add file names before source code</CheckBox>
 						<GroupBox Margin="1">
 							<StackPanel Orientation="Vertical" Margin="3">
-								<RadioButton Name="FullFileNameRB" IsChecked="False" FontSize="14">Полные имена</RadioButton>
-								<RadioButton Name="ShortToSharedFolderRB" IsChecked="True" FontSize="14">Сократить до общей папки</RadioButton>
-								<RadioButton Name="ShortToFileNameRB" IsChecked="False" FontSize="14">Сократить до имени файла</RadioButton>
+								<RadioButton Name="FullFileNameRB" IsChecked="False" FontSize="14">Full file paths</RadioButton>
+								<RadioButton Name="ShortToSharedFolderRB" IsChecked="True" FontSize="14">Shortened to shared directory</RadioButton>
+								<RadioButton Name="ShortToFileNameRB" IsChecked="False" FontSize="14">Shortened to file name only</RadioButton>
 							</StackPanel>
 						</GroupBox>
-						<CheckBox Name="RemoveIndentCB" IsChecked="True" FontSize="14">Удалить отступы в начале строки</CheckBox>
-						<CheckBox Name="RemoveEmptyCB" IsChecked="True" FontSize="14">Удалить пустые строки</CheckBox>
-						<CheckBox Name="AddLineNumsCB" IsChecked="True" FontSize="14">Добавить номера строк</CheckBox>
-						<CheckBox Name="CommonLinesNumsLengthCB" IsChecked="True" FontSize="14">Выровнять число символов в номере строки</CheckBox>
+						<CheckBox Name="RemoveIndentCB" IsChecked="True" FontSize="14">Remove indents in line starts</CheckBox>
+						<CheckBox Name="RemoveEmptyCB" IsChecked="True" FontSize="14">Remove empty lines</CheckBox>
+						<CheckBox Name="AddLineNumsCB" IsChecked="True" FontSize="14">Add lines numbering</CheckBox>
+						<CheckBox Name="CommonLinesNumsLengthCB" IsChecked="True" FontSize="14">Use common length of lines number</CheckBox>
 					</StackPanel>
 				</GroupBox>
-				<Button Name="ProceedTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10" Click="ProceedTB_Click">ОТОБРАЗИТЬ</Button>
-				<Button Name="ExportToFileTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10,0,10,5" Click="ExportToFileTB_Click">ЭКСПОРТ В ФАЙЛ</Button>
-				<TextBlock TextWrapping="Wrap" Width="350" Height="50" >Внимание! Экспорт в файл работает значительно быстрее, чем отображение в окне справа! Не рекомендуется использовать отображение для обработки большого количества файлов.</TextBlock>
+				<Button Name="ProceedTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10" Click="ProceedTB_Click">RENDER TO TEXTBOX</Button>
+				<Button Name="ExportToFileTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10,0,10,5" Click="ExportToFileTB_Click">EXPORT TO TEXT FILE</Button>
+				<TextBlock TextWrapping="Wrap" Width="350" Height="50" >Attention! Exporting to a file is much faster than displaying the output in the textbox on the right! It highly recommended to use export instead of render!</TextBlock>
 			</StackPanel>
-			<RichTextBox VerticalScrollBarVisibility="Visible" Block.LineHeight="1" Name="OutputRTB" Background="LightBlue" Margin="5" Width="600" Height="500" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="True"></RichTextBox>
+			<RichTextBox VerticalScrollBarVisibility="Visible" Block.LineHeight="1" Name="OutputRTB" Background="LightCyan" Margin="5" Width="600" Height="500" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="True"></RichTextBox>
 		</StackPanel>
 	</Grid>
 </Window>
