@@ -23,6 +23,7 @@ namespace SourceCodeFilesComplier
 		private SolidColorBrush ErrorBrush = new SolidColorBrush(Color.FromRgb(255, 220, 220));
 		private SolidColorBrush OkBrush = new SolidColorBrush(Color.FromRgb(220, 255, 220));
 
+
 		/// <exception cref="System.FormatException"/>
 		private string[] GetFileExtensionsOrShowErrorToUser()
 		{
@@ -64,7 +65,7 @@ namespace SourceCodeFilesComplier
 			var exts = this.GetFileExtensionsOrShowErrorToUser();
 			var dir = this.GetSearchDirectoryOrShowErrorToUser();
 
-			var fls = dir.GetFiles(string.Empty, this.SearchFilesInSubdirs ?
+			var fls = dir.GetFiles(string.Empty, (this.SearchSubDirsCB.IsChecked??false) ?
 				SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
 			return fls.Where(x => exts.Any(e => x.Extension.EndsWith(e)));
@@ -76,81 +77,6 @@ namespace SourceCodeFilesComplier
 		{
 			return GetInputFilesOrShowErrorToUser().Select(x => File.ReadAllText(x.FullName));
 		}
-
-
-		private string GetNameByCurrentVariant(FileInfo fi)
-		{
-			if (this.FileNameVariantInOutput == FileNameVariant.FULL_PATH) return fi.FullName;
-			if (this.FileNameVariantInOutput == FileNameVariant.TO_SHARED_PATH) return fi.FullName.Replace(LastCorrectSearchDirFullName, string.Empty);
-			if (this.FileNameVariantInOutput == FileNameVariant.FILE_NAME_ONLY) return fi.Name;
-
-			throw new NotImplementedException();
-		}
-		private string ProceedSourceCode(FileInfo sourceCodeFile, bool addFileName, bool removeLineIndets, bool addLinesNumbers)
-		{
-			var alltext = File.ReadAllText(sourceCodeFile.FullName);
-			var sb = new StringBuilder(alltext.Length + sourceCodeFile.FullName.Length);
-
-			IEnumerable<string> lines = alltext.Split('\n');
-
-			var lns = lines.ToArray();
-
-			if (this.AddFileNamesInOutput) sb.AppendLine(GetNameByCurrentVariant(sourceCodeFile));
-
-			int lineCounter = 1;
-			int maxLineNumberLength = lns.Length.ToString().Length;
-
-			for (int i = 0; i < lns.Length; i++)
-			{
-				if (this.RemoveEmptyLinesInOutput && string.IsNullOrWhiteSpace(lns[i])) continue;
-
-				if (this.AddLineNumsInOutput)
-				{
-					var currentLineNumber = lineCounter++.ToString();
-
-					int numOfSpace = 0;
-					if (this.CommonLinesNumsLengthInOutput)
-						numOfSpace = maxLineNumberLength - currentLineNumber.Length + 1;
-					if (numOfSpace < 1) numOfSpace = 1;
-
-					sb.Append(currentLineNumber);
-					sb.Append(new String(' ', numOfSpace));
-				}
-
-				if (this.RemoveIndentInOutput)
-					sb.AppendLine(lns[i].Trim());
-				else
-					sb.AppendLine(lns[i].TrimEnd());
-
-			}
-
-			return sb.ToString();
-		}
-
-
-		private bool SearchFilesInSubdirs => this.SearchSubDirsCB.IsChecked.Value;
-		private bool AddFileNamesInOutput => this.AddFileNamesCB.IsChecked.Value;
-		private enum FileNameVariant
-		{
-			FULL_PATH,
-			TO_SHARED_PATH,
-			FILE_NAME_ONLY
-		}
-		private FileNameVariant FileNameVariantInOutput
-		{
-			get
-			{
-				if (FullFileNameRB.IsChecked.Value) return FileNameVariant.FULL_PATH;
-				if (ShortToSharedFolderRB.IsChecked.Value) return FileNameVariant.TO_SHARED_PATH;
-				if (ShortToFileNameRB.IsChecked.Value) return FileNameVariant.FILE_NAME_ONLY;
-
-				return FileNameVariant.FULL_PATH;
-			}
-		}
-		private bool RemoveIndentInOutput => this.RemoveIndentCB.IsChecked.Value;
-		private bool AddLineNumsInOutput => this.AddLineNumsCB.IsChecked.Value;
-		private bool RemoveEmptyLinesInOutput => this.RemoveEmptyCB.IsChecked.Value;
-		private bool CommonLinesNumsLengthInOutput => this.CommonLinesNumsLengthCB.IsChecked.Value;
 
 		private string LastCorrectSearchDirFullName;
 
@@ -172,15 +98,26 @@ namespace SourceCodeFilesComplier
 
 		private string GenerateOutput(IEnumerable<FileInfo> fis)
 		{
-			var ToAppendSb = new StringBuilder((int)(fis.Sum(x => x.Length) / 2));
+			SourceCodeFileFormatter.FileNameVariant FileNamesCult= SourceCodeFileFormatter.FileNameVariant.FULL_PATH;
+			if (this.ShortToSharedFolderRB.IsChecked ?? false) FileNamesCult = SourceCodeFileFormatter.FileNameVariant.TO_SHARED_PATH;
+			else if (this.ShortToFileNameRB.IsChecked ?? false) FileNamesCult = SourceCodeFileFormatter.FileNameVariant.FILE_NAME_ONLY;
 
-			foreach (var f in fis)
+			SourceCodeFileFormatter proceeder = new SourceCodeFileFormatter
 			{
-				ToAppendSb.Append(this.ProceedSourceCode(f, this.AddFileNamesInOutput, this.RemoveEmptyLinesInOutput, this.AddFileNamesInOutput));
-				ToAppendSb.Append('\n');
-			}
+				AddFileNames = this.AddFileNamesCB.IsChecked ?? false,
+				UseFileNameVariant = FileNamesCult,
+				RemoveLineIndets = this.RemoveIndentCB.IsChecked ?? false,
+				RemoveEmptyLines = this.RemoveEmptyCB.IsChecked ?? false,
+				AddLinesNumbers = this.AddLineNumsCB.IsChecked ?? false,
+				UseCommonLinesNumsLength = this.CommonLinesNumsLengthCB.IsChecked ?? false,
+				FilesSharedDirectory = this.LastCorrectSearchDirFullName
+			};
 
-			return ToAppendSb.ToString();
+			var outputBuilder = new StringBuilder((int)fis.Sum(x => x.Length / 50));
+
+			foreach (var f in fis) { outputBuilder.AppendLine(proceeder.ProceedSourceCode(f));}
+
+			return outputBuilder.ToString();
 		}
 
 		private void ProceedTB_Click(object sender, RoutedEventArgs e)
@@ -198,6 +135,7 @@ namespace SourceCodeFilesComplier
 			var fd = new SaveFileDialog();
 			fd.Filter = @"Text files (*.txt)|*.txt|All files (*.*)|*.*";
 			fd.ShowDialog();
+
 			if (!string.IsNullOrEmpty(fd.FileName))
 			{
 				IEnumerable<FileInfo> files;
