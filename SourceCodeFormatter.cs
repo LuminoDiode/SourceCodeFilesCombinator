@@ -19,7 +19,7 @@ using System.IO;
 using System.Collections;
 using System.Windows.Forms;
 
-namespace SourceCodeFilesComplier
+namespace SourceCodeFilesCombinator
 {
 	public class SourceCodeFileFormatter
 	{
