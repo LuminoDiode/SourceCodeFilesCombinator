@@ -23,23 +23,22 @@ namespace SourceCodeFilesComplier
 {
 	public class SourceCodeFileFormatter
 	{
-		public bool AddFileNames { get; set; } = true;
-		public bool RemoveLineIndets { get; set; } = true;
-		public bool RemoveEmptyLines { get; set; } = true;
-		public bool AddLinesNumbers { get; set; } = true;
-		public bool UseCommonLinesNumsLength { get; set; } = true;
-
 		public enum FileNameVariant
 		{
 			FULL_PATH,
 			TO_SHARED_PATH,
 			FILE_NAME_ONLY
 		}
+
+		public bool AddFileNames { get; set; } = true;
+		public bool RemoveLineIndets { get; set; } = true;
+		public bool RemoveEmptyLines { get; set; } = true;
+		public bool AddLinesNumbers { get; set; } = true;
+		public bool UseCommonLinesNumsLength { get; set; } = true;
 		public FileNameVariant UseFileNameVariant { get; set; } = FileNameVariant.FULL_PATH;
 
-		/// <summary> Directory full name which is user to trim file names while using FileNameVariantInOutput==TO_SHARED_PATH. </summary>
-		public string FilesSharedDirectory { get; set; } = string.Empty;
-
+		/// <summary> Directory full name which is user to trim file names when using FileNameVariantInOutput==TO_SHARED_PATH. </summary>
+		public string FilesSharedDirectory { get; set; } = " ";
 
 		private string GetNameByCurrentVariant(FileInfo fi)
 		{
@@ -50,6 +49,7 @@ namespace SourceCodeFilesComplier
 			throw new NotImplementedException();
 		}
 
+		/// <exception cref="System.ArgumentNullException"/>
 		public string ProceedSourceCode(FileInfo sourceCodeFile)
 		{
 			var lines = File.ReadAllLines(sourceCodeFile.FullName);
@@ -64,14 +64,14 @@ namespace SourceCodeFilesComplier
 				if (this.AddLinesNumbers)
 				{
 					var currentLineNumber = lineCounter++.ToString();
-					int numOfSpace = 0;
+					int numOfSpaces = 0;
 
 					if (this.UseCommonLinesNumsLength)
-						numOfSpace = maxLineNumberLength - currentLineNumber.Length + 1;
-					if (numOfSpace < 1) numOfSpace = 1;
+						numOfSpaces = maxLineNumberLength - currentLineNumber.Length + 1;
+					if (numOfSpaces < 1) numOfSpaces = 1;
 
 					sb.Append(currentLineNumber);
-					sb.Append(new string(' ', numOfSpace));
+					sb.Append(new string(' ', numOfSpaces));
 				}
 
 				if (this.RemoveLineIndets)

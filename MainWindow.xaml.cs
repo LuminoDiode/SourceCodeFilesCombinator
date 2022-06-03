@@ -61,8 +61,12 @@ namespace SourceCodeFilesComplier
 		/// <exception cref="System.FormatException"/>
 		private IEnumerable<FileInfo> GetInputFilesOrShowErrorToUser()
 		{
-			var exts = this.GetFileExtensionsOrShowErrorToUser();
-			var dir = this.GetSearchDirectoryOrShowErrorToUser();
+			var exList = new List<Exception>(2);
+			string[] exts=null;
+			DirectoryInfo dir= null;
+			try { exts = this.GetFileExtensionsOrShowErrorToUser(); } catch(Exception ex) { exList.Add(ex); }
+			try { dir = this.GetSearchDirectoryOrShowErrorToUser(); } catch(Exception ex) { exList.Add(ex); }
+			foreach (var ex in exList) throw ex;
 
 			var fls = dir.GetFiles(string.Empty, (this.SearchSubDirsCB.IsChecked??false) ?
 				SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
@@ -71,20 +75,17 @@ namespace SourceCodeFilesComplier
 		}
 
 		private string LastCorrectSearchDirFullName { get; set; }
-
 		public MainWindow()
 		{
 			InitializeComponent();
+			this.OutputRTB.FontFamily = new FontFamily("Consolas");
 		}
 
 		private void OpenFolderDialogBT_Click(object sender, RoutedEventArgs e)
 		{
 			var fd = new FolderBrowserDialog();
 			fd.ShowDialog();
-			if (!string.IsNullOrEmpty(fd.SelectedPath))
-			{
-				this.FolderInputTB.Text = fd.SelectedPath;
-			}
+			if (!string.IsNullOrEmpty(fd.SelectedPath)) this.FolderInputTB.Text = fd.SelectedPath;
 			fd.Dispose();
 		}
 
@@ -105,10 +106,8 @@ namespace SourceCodeFilesComplier
 				FilesSharedDirectory = this.LastCorrectSearchDirFullName
 			};
 
-			var outputBuilder = new StringBuilder((int)fis.Sum(x => x.Length / 50));
-
+			var outputBuilder = new StringBuilder((int)fis.Sum(x => x.Length / 2));
 			foreach (var f in fis) { outputBuilder.AppendLine(proceeder.ProceedSourceCode(f));}
-
 			return outputBuilder.ToString();
 		}
 
@@ -134,6 +133,8 @@ namespace SourceCodeFilesComplier
 				try { files = GetInputFilesOrShowErrorToUser(); } catch { return; }
 				File.WriteAllText(fd.FileName, this.GenerateOutput(files));
 			}
+
+			fd.Dispose();
 		}
 	}
 }

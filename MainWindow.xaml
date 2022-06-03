@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SourceCodeFilesComplier"
         mc:Ignorable="d"
-        Title="Source Code Files Complier" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
+        Title="Source Code Files Combinator by github.com/LuminoDiode" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
 	<Grid>
 		<StackPanel Orientation="Horizontal">
 			<StackPanel Orientation="Vertical" Margin="5">
@@ -39,7 +39,9 @@
 				</GroupBox>
 				<Button Name="ProceedTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10" Click="ProceedTB_Click">RENDER TO TEXTBOX</Button>
 				<Button Name="ExportToFileTB" FontSize="14" VerticalContentAlignment="Top" FontWeight="SemiBold" Margin="10,0,10,5" Click="ExportToFileTB_Click">EXPORT TO TEXT FILE</Button>
-				<TextBlock TextWrapping="Wrap" Width="350" Height="50" >Attention! Exporting to a file is much faster than displaying the output in the textbox on the right! It highly recommended to use export instead of render!</TextBlock>
+				<TextBlock TextWrapping="Wrap" Width="350" Height="50" >
+					Attention! Exporting to a file is much faster than displaying the output in the textbox on the right! It highly recommended to use export instead of render!
+				</TextBlock>
 			</StackPanel>
 			<RichTextBox VerticalScrollBarVisibility="Visible" Block.LineHeight="1" Name="OutputRTB" Background="LightCyan" Margin="5" Width="600" Height="500" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="True"></RichTextBox>
 		</StackPanel>
