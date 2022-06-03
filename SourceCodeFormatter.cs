@@ -1,23 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
-using System.Collections;
-using System.Windows.Forms;
 
 namespace SourceCodeFilesCombinator
 {
@@ -43,7 +27,7 @@ namespace SourceCodeFilesCombinator
 		private string GetNameByCurrentVariant(FileInfo fi)
 		{
 			if (this.UseFileNameVariant == FileNameVariant.FULL_PATH) return fi.FullName;
-			if (this.UseFileNameVariant == FileNameVariant.TO_SHARED_PATH) return fi.FullName.Replace(FilesSharedDirectory, string.Empty);
+			if (this.UseFileNameVariant == FileNameVariant.TO_SHARED_PATH) return fi.FullName.Replace(this.FilesSharedDirectory, string.Empty);
 			if (this.UseFileNameVariant == FileNameVariant.FILE_NAME_ONLY) return fi.Name;
 
 			throw new NotImplementedException();
@@ -56,7 +40,7 @@ namespace SourceCodeFilesCombinator
 			var sb = new StringBuilder(lines.Sum(x => x.Length) + sourceCodeFile.FullName.Length);
 			int maxLineNumberLength = lines.Length.ToString().Length;
 
-			if (this.AddFileNames) sb.AppendLine(GetNameByCurrentVariant(sourceCodeFile));
+			if (this.AddFileNames) sb.AppendLine(this.GetNameByCurrentVariant(sourceCodeFile));
 			for (int i = 0, lineCounter = 1; i < lines.Length; i++)
 			{
 				if (this.RemoveEmptyLines && string.IsNullOrWhiteSpace(lines[i])) continue;

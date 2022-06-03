@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
-using System.Collections;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace SourceCodeFilesCombinator
 {
 	public partial class MainWindow : Window
 	{
-		private SolidColorBrush ErrorBrush = new SolidColorBrush(Color.FromRgb(255, 220, 220));
-		private SolidColorBrush OkBrush = new SolidColorBrush(Color.FromRgb(220, 255, 220));
+		private readonly SolidColorBrush ErrorBrush = new SolidColorBrush(Color.FromRgb(255, 220, 220));
+		private readonly SolidColorBrush OkBrush = new SolidColorBrush(Color.FromRgb(220, 255, 220));
 
 		/// <exception cref="System.FormatException"/>
 		private string[] GetFileExtensionsOrShowErrorToUser()
@@ -62,13 +53,13 @@ namespace SourceCodeFilesCombinator
 		private IEnumerable<FileInfo> GetInputFilesOrShowErrorToUser()
 		{
 			var exList = new List<Exception>(2);
-			string[] exts=null;
-			DirectoryInfo dir= null;
-			try { exts = this.GetFileExtensionsOrShowErrorToUser(); } catch(Exception ex) { exList.Add(ex); }
-			try { dir = this.GetSearchDirectoryOrShowErrorToUser(); } catch(Exception ex) { exList.Add(ex); }
+			string[] exts = null;
+			DirectoryInfo dir = null;
+			try { exts = this.GetFileExtensionsOrShowErrorToUser(); } catch (Exception ex) { exList.Add(ex); }
+			try { dir = this.GetSearchDirectoryOrShowErrorToUser(); } catch (Exception ex) { exList.Add(ex); }
 			foreach (var ex in exList) throw ex;
 
-			var fls = dir.GetFiles(string.Empty, (this.SearchSubDirsCB.IsChecked??false) ?
+			var fls = dir.GetFiles(string.Empty, (this.SearchSubDirsCB.IsChecked ?? false) ?
 				SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
 			return fls.Where(x => exts.Any(e => x.Extension.EndsWith(e)));
@@ -77,7 +68,7 @@ namespace SourceCodeFilesCombinator
 		private string LastCorrectSearchDirFullName { get; set; }
 		public MainWindow()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 			this.OutputRTB.FontFamily = new FontFamily("Consolas");
 		}
 
@@ -91,7 +82,7 @@ namespace SourceCodeFilesCombinator
 
 		private string GenerateOutput(IEnumerable<FileInfo> fis)
 		{
-			SourceCodeFileFormatter.FileNameVariant FileNamesCult= SourceCodeFileFormatter.FileNameVariant.FULL_PATH;
+			SourceCodeFileFormatter.FileNameVariant FileNamesCult = SourceCodeFileFormatter.FileNameVariant.FULL_PATH;
 			if (this.ShortToSharedFolderRB.IsChecked ?? false) FileNamesCult = SourceCodeFileFormatter.FileNameVariant.TO_SHARED_PATH;
 			else if (this.ShortToFileNameRB.IsChecked ?? false) FileNamesCult = SourceCodeFileFormatter.FileNameVariant.FILE_NAME_ONLY;
 
@@ -107,7 +98,7 @@ namespace SourceCodeFilesCombinator
 			};
 
 			var outputBuilder = new StringBuilder((int)fis.Sum(x => x.Length / 2));
-			foreach (var f in fis) { outputBuilder.AppendLine(proceeder.ProceedSourceCode(f));}
+			foreach (var f in fis) { outputBuilder.AppendLine(proceeder.ProceedSourceCode(f)); }
 			return outputBuilder.ToString();
 		}
 
@@ -116,7 +107,7 @@ namespace SourceCodeFilesCombinator
 			this.OutputRTB.Document.Blocks.Clear();
 
 			IEnumerable<FileInfo> files;
-			try { files = GetInputFilesOrShowErrorToUser(); } catch { return; }
+			try { files = this.GetInputFilesOrShowErrorToUser(); } catch { return; }
 
 			this.OutputRTB.AppendText(this.GenerateOutput(files));
 		}
@@ -130,7 +121,7 @@ namespace SourceCodeFilesCombinator
 			if (!string.IsNullOrEmpty(fd.FileName))
 			{
 				IEnumerable<FileInfo> files;
-				try { files = GetInputFilesOrShowErrorToUser(); } catch { return; }
+				try { files = this.GetInputFilesOrShowErrorToUser(); } catch { return; }
 				File.WriteAllText(fd.FileName, this.GenerateOutput(files));
 			}
 
